@@ -46,8 +46,17 @@ while True:
             print("\n")
             print("===== INCLUSÃO =====")
             print("\n")
+            cod_estudante = 0
             nome_estudante = input("Informe o nome do estudante: ")
-            lista_estudantes.append(nome_estudante)
+            cpf_estudante = input("Informe o CPF do estudante: ")
+
+            dic = {}
+
+            dic["codigo"] = cod_estudante + (len(lista_estudantes) + 1)
+            dic["nome"] = nome_estudante
+            dic["cpf"] = cpf_estudante
+
+            lista_estudantes.append(dic)
             input("Pressione ENTER para continuar.")
             print("\n")
           elif opcao_crud == 2:
@@ -62,10 +71,46 @@ while True:
                 print(f"- {nome}")
             input("Pressione ENTER para continuar.")
             print("\n")
-          elif opcao_crud == 3 or opcao_crud == 4:
-            print("\n")
-            print("EM DESENVOLVIMENTO")
-            print("\n")
+          elif opcao_crud == 3:
+            if len(lista_estudantes) == 0:
+              print("Não há estudantes cadastrados.")
+              print("\n")
+            else:
+              cod_estudante = int(input("Digite o código do estudante a ser alterado: "))
+              flag = True
+              for i in range(0, len(lista_estudantes)):
+                estudante = lista_estudantes[i]
+                if estudante["codigo"] == cod_estudante:
+                  flag = False
+                  cod_estudante = int(input("Informe o novo código do estudante: "))
+                  nome_estudante = input("Informe o novo nome do estudante: ")
+                  cpf_estudante = input("Informe o novo CPF do estudante: ")
+
+                  estudante["codigo"] = cod_estudante
+                  estudante["nome"] = nome_estudante
+                  estudante["cpf"] = cpf_estudante
+                  print("Estudante alterado!\n")
+                  break
+              if flag:
+                print("Estudante não encontrado!\n")
+              input("Pressione ENTER para continuar...")
+          elif opcao_crud == 4:
+            if len(lista_estudantes) == 0:
+              print("Não há estudantes cadastrados.")
+              print("\n")
+            else:
+              cod_estudante = int(input("Digite o código do estudante a ser excluído: "))
+              flag = True
+              for i in range(0, len(lista_estudantes)):
+                estudante = lista_estudantes[i]
+                if estudante["codigo"] == cod_estudante:
+                  flag = False
+                  lista_estudantes.pop(i)
+                  print("Estudante deletado!\n")
+                  break
+              if flag:
+                print("Estudante não encontrado!\n")
+              input("Pressione ENTER para continuar...")
           else:
             print("\n")
             print("Opção inválida! Digite novamente...")
