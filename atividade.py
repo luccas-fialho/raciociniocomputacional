@@ -3,7 +3,7 @@ nome: Luccas Fialho dos Santos
 curso: Análise e Desenvolvimento de Sistemas 
 """
 
-lista_estudantes = []
+lista = []
 
 def menuPrincipal():
   print("----- MENU PRINCIPAL -----\n")
@@ -22,92 +22,127 @@ def menuSecundario(contexto):
   print("(4) Excluir.")
   print("(9) Voltar ao menu principal.\n")
 
-def incluirEstudante():
-  print("\n===== INCLUSÃO =====\n")
+def verificaCadastro(opcao, cod_estudante):
   jaCadastrado = False
-  cod_estudante = int(input("Informe o código do estudante: "))
-
-  for estudante in lista_estudantes:
+  for estudante in lista[opcao-1]:
     if cod_estudante in estudante.values():
       jaCadastrado = True
       break
-            
-  if not jaCadastrado:
-    nome_estudante = input("Informe o nome do estudante: ")
-    cpf_estudante = input("Informe o CPF do estudante: ")
+  return jaCadastrado
 
-    estudante = {}
+def incluirEstudante(opcao, cod_estudante):
+  nome_estudante = input("Informe o nome do estudante: ")
+  cpf_estudante = input("Informe o CPF do estudante: ")
 
-    estudante["codigo"] = cod_estudante 
-    estudante["nome"] = nome_estudante
-    estudante["cpf"] = cpf_estudante
+  estudante = {}
 
-    lista_estudantes.append(estudante)
+  estudante["codigo"] = cod_estudante 
+  estudante["nome"] = nome_estudante
+  estudante["cpf"] = cpf_estudante
+
+  lista[opcao-1].append(estudante)
+
+def incluir(opcao):
+  print("\n===== INCLUSÃO =====\n")
+  
+  codigo = int(input("Informe o código: "))
+        
+  if not verificaCadastro(opcao, codigo):
+    if opcao == 1:
+      incluirEstudante(opcao, codigo)
   else:
-    print("\nCódigo de estudante já cadastrado!\n")
+    print("\nCódigo já cadastrado!\n")
   
   input("Pressione ENTER para continuar.")
   print("\n")
 
-def listarEstudantes():
+def listarEstudantes(opcao):
+  for obj in lista[opcao-1]:
+    cod = obj["codigo"]
+    nome = obj["nome"]
+    cpf = obj["cpf"]
+    print(f"Código: {cod}, Nome: {nome}, CPF: {cpf}")
+
+def verificaVazia(lista, opcao):
+  return len(lista[opcao-1]) == 0
+
+def listar(opcao):
   print("\n===== LISTAGEM =====\n")
-  if len(lista_estudantes) == 0:
-    print("Não há estudantes cadastrados.")
+  if verificaVazia(lista, opcao):
+    print("Não há nada cadastrado ainda.")
   else:
-    for estudante in lista_estudantes:
-      cod = estudante["codigo"]
-      nome = estudante["nome"]
-      cpf = estudante["cpf"]
-      print(f"Código: {cod}, Nome: {nome}, CPF: {cpf}")
+    if opcao == 1:
+      listarEstudantes(opcao)
   input("\nPressione ENTER para continuar.")
   print("\n")    
-  
-def editarEstudante():
-  print("\n===== ALTERAÇÃO =====\n")
-  if len(lista_estudantes) == 0:
-    print("Não há estudantes cadastrados.\n")
-  else:
-    cod_estudante = int(input("Digite o código do estudante a ser alterado: "))
-    flag = True
-    for i in range(0, len(lista_estudantes)):
-      estudante = lista_estudantes[i]
-      if estudante["codigo"] == cod_estudante:
-        flag = False
-        cod_estudante = int(input("Informe o novo código do estudante: "))
-        nome_estudante = input("Informe o novo nome do estudante: ")
-        cpf_estudante = input("Informe o novo CPF do estudante: ")
 
-        estudante["codigo"] = cod_estudante
-        estudante["nome"] = nome_estudante
-        estudante["cpf"] = cpf_estudante
-        print("Informações do estudante alteradas!\n")
-        break
-    if flag:
-      print("\nEstudante não encontrado!\n")
+def editarEstudante(opcao):
+  cod_estudante = int(input("Digite o código do estudante a ser alterado: "))
+  flag = True
+  for i in range(0, len(lista[opcao-1])):
+    estudante = lista[opcao-1][i]
+    if estudante["codigo"] == cod_estudante:
+      flag = False
+      cod_estudante = int(input("Informe o novo código do estudante: "))
+      nome_estudante = input("Informe o novo nome do estudante: ")
+      cpf_estudante = input("Informe o novo CPF do estudante: ")
+
+      estudante["codigo"] = cod_estudante
+      estudante["nome"] = nome_estudante
+      estudante["cpf"] = cpf_estudante
+      print("Informações do estudante alteradas!\n")
+      break
+  if flag:
+    print("\nEstudante não encontrado!\n")
+ 
+def editar(opcao):
+  print("\n===== ALTERAÇÃO =====\n")
+  if verificaVazia(lista, opcao):
+    print("Não há nada cadastrado.\n")
+  else:
+    if opcao == 1:
+      editarEstudante(opcao)
+    
   input("Pressione ENTER para continuar...")
   print("\n")
+
+def excluirEstudante(opcao):
+  cod_estudante = int(input("Digite o código do estudante a ser excluído: "))
+  flag = True
+  for i in range(0, len(lista[opcao-1])):
+    estudante = lista[opcao-1][i]
+    if estudante["codigo"] == cod_estudante:
+      flag = False
+      lista[opcao-1].pop(i)
+      print("\nEstudante deletado!\n")
+      break
+  if flag:
+    print("\nEstudante não encontrado!\n")
  
-def excluirEstudante():
+def excluir(opcao):
   print("\n===== EXCLUSÃO =====\n")
-  if len(lista_estudantes) == 0:
-    print("Não há estudantes cadastrados.\n")
+  if verificaVazia(lista, opcao):
+    print("Não há nada cadastrado.\n")
   else:
-    cod_estudante = int(input("Digite o código do estudante a ser excluído: "))
-    flag = True
-    for i in range(0, len(lista_estudantes)):
-      estudante = lista_estudantes[i]
-      if estudante["codigo"] == cod_estudante:
-        flag = False
-        lista_estudantes.pop(i)
-        print("\nEstudante deletado!\n")
-        break
-    if flag:
-      print("\nEstudante não encontrado!\n")
+    if opcao == 1:
+      excluirEstudante(opcao)
   input("Pressione ENTER para continuar...")
   print("\n") 
   
 # loop principal do sistema
 while True:
+  estudantes = []
+  turmas = []
+  disciplinas = []
+  professores = []
+  matriculas = []
+  
+  lista.append(estudantes)
+  lista.append(turmas)
+  lista.append(disciplinas)
+  lista.append(professores)
+  lista.append(matriculas)
+  
   menuPrincipal()
 
   # Try/Except para lidar com entrada de caracteres inválidos
@@ -125,13 +160,13 @@ while True:
             print("\nVoltando ao menu principal...\n")
             break
           elif opcao_crud == 1:
-            incluirEstudante()
+            incluir(opcao_gerenciamento)
           elif opcao_crud == 2:
-            listarEstudantes()
+            listar(opcao_gerenciamento)
           elif opcao_crud == 3:
-            editarEstudante()
+            editar(opcao_gerenciamento)
           elif opcao_crud == 4:
-            excluirEstudante()
+            excluir(opcao_gerenciamento)
           else:
             print("\nOpção inválida! Digite novamente...\n")
         except ValueError:
