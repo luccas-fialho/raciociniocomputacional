@@ -3,6 +3,9 @@ nome: Luccas Fialho dos Santos
 curso: Análise e Desenvolvimento de Sistemas 
 """
 
+import json
+
+listaEstudantes = "estudantes.json"
 lista = []
 
 def menuPrincipal():
@@ -30,6 +33,18 @@ def verificaCadastro(opcao, cod_estudante):
       break
   return jaCadastrado
 
+def recuperaEstudantesJSON(nome_arquivo):
+  try:
+    with open(nome_arquivo, "r") as arquivo:
+      lista = json.load(arquivo)
+    return lista
+  except:
+    return []
+  
+def escreverEstudantesJSON(lista, nome_arquivo):
+  with open(nome_arquivo, "w") as arquivo:
+    json.dump(lista, arquivo)
+
 def incluirEstudante(opcao, cod_estudante):
   nome_estudante = input("Informe o nome do estudante: ")
   cpf_estudante = input("Informe o CPF do estudante: ")
@@ -39,8 +54,9 @@ def incluirEstudante(opcao, cod_estudante):
   estudante["codigo"] = cod_estudante 
   estudante["nome"] = nome_estudante
   estudante["cpf"] = cpf_estudante
-
+  
   lista[opcao-1].append(estudante)
+  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
 
 def incluir(opcao):
   print("\n===== INCLUSÃO =====\n")
@@ -94,6 +110,8 @@ def editarEstudante(opcao):
       break
   if flag:
     print("\nEstudante não encontrado!\n")
+  
+  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
  
 def editar(opcao):
   print("\n===== ALTERAÇÃO =====\n")
@@ -118,6 +136,8 @@ def excluirEstudante(opcao):
       break
   if flag:
     print("\nEstudante não encontrado!\n")
+    
+  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
  
 def excluir(opcao):
   print("\n===== EXCLUSÃO =====\n")
@@ -131,7 +151,7 @@ def excluir(opcao):
   
 # loop principal do sistema
 while True:
-  estudantes = []
+  estudantes = recuperaEstudantesJSON(listaEstudantes)
   turmas = []
   disciplinas = []
   professores = []
