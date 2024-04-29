@@ -5,7 +5,12 @@ curso: Análise e Desenvolvimento de Sistemas
 
 import json
 
-listaEstudantes = "estudantes.json"
+dadosEstudantes = "estudantes.json"
+dadosProfessores = "professores.json"
+dadosDisciplinas = "disciplinas.json"
+dadosTurmas = "turmas.json"
+dadosMatriculas = "matriculas.json"
+
 lista = []
 
 def menuPrincipal():
@@ -25,15 +30,15 @@ def menuSecundario(contexto):
   print("(4) Excluir.")
   print("(9) Voltar ao menu principal.\n")
 
-def verificaCadastro(opcao, cod_estudante):
+def verificaCadastro(opcao, codigo):
   jaCadastrado = False
-  for estudante in lista[opcao-1]:
-    if cod_estudante in estudante.values():
+  for obj in lista[opcao-1]:
+    if codigo in obj.values():
       jaCadastrado = True
       break
   return jaCadastrado
 
-def recuperaEstudantesJSON(nome_arquivo):
+def recuperaJSON(nome_arquivo):
   try:
     with open(nome_arquivo, "r") as arquivo:
       lista = json.load(arquivo)
@@ -41,22 +46,29 @@ def recuperaEstudantesJSON(nome_arquivo):
   except:
     return []
   
-def escreverEstudantesJSON(lista, nome_arquivo):
+def escreverJSON(lista, nome_arquivo):
   with open(nome_arquivo, "w") as arquivo:
     json.dump(lista, arquivo)
 
-def incluirEstudante(opcao, cod_estudante):
-  nome_estudante = input("Informe o nome do estudante: ")
-  cpf_estudante = input("Informe o CPF do estudante: ")
-
-  estudante = {}
-
-  estudante["codigo"] = cod_estudante 
-  estudante["nome"] = nome_estudante
-  estudante["cpf"] = cpf_estudante
+def incluirEstudanteOuProfessor(opcao, codigo):
+  if opcao == 1:
+    nome = input("Informe o nome do estudante: ")
+    cpf = input("Informe o CPF do estudante: ")
+  else:
+    nome = input("Informe o nome do professor: ")
+    cpf = input("Informe o CPF do professor: ")
   
-  lista[opcao-1].append(estudante)
-  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
+  pessoa = {}
+
+  pessoa["codigo"] = codigo
+  pessoa["nome"] = nome
+  pessoa["cpf"] = cpf
+  
+  lista[opcao-1].append(pessoa)
+  if opcao == 1:
+    escreverJSON(lista[opcao-1], dadosEstudantes)
+  else:
+    escreverJSON(lista[opcao-1], dadosProfessores)
 
 def incluir(opcao):
   print("\n===== INCLUSÃO =====\n")
@@ -64,15 +76,16 @@ def incluir(opcao):
   codigo = int(input("Informe o código: "))
         
   if not verificaCadastro(opcao, codigo):
-    if opcao == 1:
-      incluirEstudante(opcao, codigo)
+    if opcao == 1 or opcao == 2:
+      incluirEstudanteOuProfessor(opcao, codigo)
   else:
     print("\nCódigo já cadastrado!\n")
   
   input("Pressione ENTER para continuar.")
   print("\n")
 
-def listarEstudantes(opcao):
+def listarEstudantesOuProfessores(opcao):
+  print("Lista de Estudantes:" if opcao == 1 else "Lista de Professores:")
   for obj in lista[opcao-1]:
     cod = obj["codigo"]
     nome = obj["nome"]
@@ -87,80 +100,86 @@ def listar(opcao):
   if verificaVazia(lista, opcao):
     print("Não há nada cadastrado ainda.")
   else:
-    if opcao == 1:
-      listarEstudantes(opcao)
+    if opcao == 1 or opcao == 2:
+      listarEstudantesOuProfessores(opcao)
   input("\nPressione ENTER para continuar.")
   print("\n")    
 
-def editarEstudante(opcao):
-  cod_estudante = int(input("Digite o código do estudante a ser alterado: "))
-  flag = True
-  for i in range(0, len(lista[opcao-1])):
-    estudante = lista[opcao-1][i]
-    if estudante["codigo"] == cod_estudante:
-      flag = False
-      cod_estudante = int(input("Informe o novo código do estudante: "))
-      nome_estudante = input("Informe o novo nome do estudante: ")
-      cpf_estudante = input("Informe o novo CPF do estudante: ")
-
-      estudante["codigo"] = cod_estudante
-      estudante["nome"] = nome_estudante
-      estudante["cpf"] = cpf_estudante
-      print("Informações do estudante alteradas!\n")
-      break
-  if flag:
-    print("\nEstudante não encontrado!\n")
+def editarEstudanteOuProfessor(opcao):
+  if opcao == 1:
+    codigo = int(input("Digite o código do estudante a ser alterado: "))
+  else:
+    codigo = int(input("Digite o código do professor a ser alterado: "))
   
-  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
+  if verificaCadastro(opcao, codigo):
+    for i in range(0, len(lista[opcao-1])):
+      pessoa = lista[opcao-1][i]
+      if pessoa["codigo"] == codigo:
+        codigoPessoa = int(input("Informe o novo código: "))
+        nome = input("Informe o novo nome: ")
+        cpf = input("Informe o novo CPF: ")
+
+        pessoa["codigo"] = codigoPessoa
+        pessoa["nome"] = nome
+        pessoa["cpf"] = cpf
+        print("Informações alteradas!\n")
+        break
+  else:
+    print("\nCódigo não encontrado!\n")
+  
+  escreverJSON(lista[opcao-1], dadosEstudantes) if opcao == 1 else escreverJSON(lista[opcao-1], dadosProfessores)
  
 def editar(opcao):
   print("\n===== ALTERAÇÃO =====\n")
   if verificaVazia(lista, opcao):
     print("Não há nada cadastrado.\n")
   else:
-    if opcao == 1:
-      editarEstudante(opcao)
+    if opcao == 1 or opcao == 2:
+      editarEstudanteOuProfessor(opcao)
     
   input("Pressione ENTER para continuar...")
   print("\n")
 
-def excluirEstudante(opcao):
-  cod_estudante = int(input("Digite o código do estudante a ser excluído: "))
-  flag = True
-  for i in range(0, len(lista[opcao-1])):
-    estudante = lista[opcao-1][i]
-    if estudante["codigo"] == cod_estudante:
-      flag = False
-      lista[opcao-1].pop(i)
-      print("\nEstudante deletado!\n")
-      break
-  if flag:
-    print("\nEstudante não encontrado!\n")
+def excluirCadastro(opcao):
+  codigo = int(input("Digite o código do cadastro a ser excluído: "))
+  
+  if verificaCadastro(opcao, codigo):
+    for i in range(0, len(lista[opcao-1])):
+      obj = lista[opcao-1][i]
+      if obj["codigo"] == codigo:
+        lista[opcao-1].pop(i)
+        print("\nCadastro deletado!\n")
+        break
+  else:
+    print("\nCadastro não encontrado!\n")
     
-  escreverEstudantesJSON(lista[opcao-1], listaEstudantes)
+  if opcao == 1:
+    escreverJSON(lista[opcao-1], dadosEstudantes)
+  elif opcao == 2:
+    escreverJSON(lista[opcao-1], dadosProfessores)
  
 def excluir(opcao):
   print("\n===== EXCLUSÃO =====\n")
   if verificaVazia(lista, opcao):
     print("Não há nada cadastrado.\n")
   else:
-    if opcao == 1:
-      excluirEstudante(opcao)
+    if opcao == 1 or opcao == 2:
+      excluirCadastro(opcao)
   input("Pressione ENTER para continuar...")
   print("\n") 
   
 # loop principal do sistema
 while True:
-  estudantes = recuperaEstudantesJSON(listaEstudantes)
-  turmas = []
+  estudantes = recuperaJSON(dadosEstudantes)
+  professores = recuperaJSON(dadosProfessores)
   disciplinas = []
-  professores = []
+  turmas = []
   matriculas = []
   
   lista.append(estudantes)
-  lista.append(turmas)
-  lista.append(disciplinas)
   lista.append(professores)
+  lista.append(disciplinas)
+  lista.append(turmas)
   lista.append(matriculas)
   
   menuPrincipal()
@@ -191,7 +210,32 @@ while True:
             print("\nOpção inválida! Digite novamente...\n")
         except ValueError:
           print("\nA opção deve ser um número!\n")
-    elif opcao_gerenciamento == 2 or opcao_gerenciamento == 3 or opcao_gerenciamento == 4 or opcao_gerenciamento == 5:
+    elif opcao_gerenciamento == 2:
+      while True:
+        menuSecundario("professores")
+        # Outro Try/Except para lidar com caracteres inválidos
+        try:
+          opcao_crud = int(input("Informe a opção desejada: "))
+          if opcao_crud == 9:
+            print("\nVoltando ao menu principal...\n")
+            break
+          elif opcao_crud == 1:
+            incluir(opcao_gerenciamento)
+          elif opcao_crud == 2:
+            listar(opcao_gerenciamento)
+          elif opcao_crud == 3:
+            editar(opcao_gerenciamento)
+          elif opcao_crud == 4:
+            excluir(opcao_gerenciamento)
+          else:
+            print("\nOpção inválida! Digite novamente...\n")
+        except ValueError:
+          print("\nA opção deve ser um número!\n")
+    elif opcao_gerenciamento == 3:
+      print("EM DESENVOLVIMENTO\n")
+    elif opcao_gerenciamento == 4:
+      print("EM DESENVOLVIMENTO\n")
+    elif opcao_gerenciamento == 5:
       print("EM DESENVOLVIMENTO\n")
     elif opcao_gerenciamento == 9:
       print("===== ATUALIZAÇÃO =====\n")
