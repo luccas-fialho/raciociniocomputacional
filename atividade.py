@@ -119,7 +119,7 @@ def incluirDisciplina(opcao, codigo):
 def incluirTurma(opcao, codTurma):
     turma = {}
     turma["codigo"] = codTurma
-    
+
     try:
         codProfessor = int(input("Informe o código do Professor: "))
         if not verificaCadastro(2, codProfessor):
@@ -137,29 +137,36 @@ def incluirTurma(opcao, codTurma):
             return
         turma["codigo_disciplina"] = codDisciplina
     except ValueError:
-      print("Deve ser um número!")
-      return
+        print("Deve ser um número!")
+        return
 
     lista[opcao-1].append(turma)
     escreverJSON(lista[opcao-1], dadosTurmas)
 
 
 def incluirMatricula(opcao, codMatricula):
-    codTurma = int(input("Informe o código da turma: "))
-    if not verificaCadastro(4, codTurma):
-        print("Nenhuma turma com esse código encontrada!")
-        return
-
-    codEstudante = int(input("Informe o código do estudante: "))
-    if not verificaCadastro(1, codEstudante):
-        print("Nenhum estudante com esse código encontrado!")
-        return
-
     matricula = {}
-
     matricula["codigo"] = codMatricula
-    matricula["codigo_turma"] = codTurma
-    matricula["codigo_estudante"] = codEstudante
+
+    try:
+        codTurma = int(input("Informe o código da turma: "))
+        if not verificaCadastro(4, codTurma):
+            print("Nenhuma turma com esse código encontrada!")
+            return
+        matricula["codigo_turma"] = codTurma
+    except ValueError:
+        print("Deve ser um número!")
+        return
+
+    try:
+        codEstudante = int(input("Informe o código do estudante: "))
+        if not verificaCadastro(1, codEstudante):
+            print("Nenhum estudante com esse código encontrado!")
+            return
+        matricula["codigo_estudante"] = codEstudante
+    except ValueError:
+        print("Deve ser um número!")
+        return
 
     lista[opcao-1].append(matricula)
     escreverJSON(lista[opcao-1], dadosMatriculas)
@@ -168,19 +175,22 @@ def incluirMatricula(opcao, codMatricula):
 def incluir(opcao):
     print("\n===== INCLUSÃO =====\n")
 
-    codigo = int(input("Informe o código: "))
+    try:
+        codigo = int(input("Informe o código: "))
 
-    if verificaCadastro(opcao, codigo):
-        print("\nCódigo já cadastrado!\n")
-    else:
-        if opcao == 1 or opcao == 2:
-            incluirEstudanteOuProfessor(opcao, codigo)
-        elif opcao == 3:
-            incluirDisciplina(opcao, codigo)
-        elif opcao == 4:
-            incluirTurma(opcao, codigo)
+        if verificaCadastro(opcao, codigo):
+            print("\nCódigo já cadastrado!\n")
         else:
-            incluirMatricula(opcao, codigo)
+            if opcao == 1 or opcao == 2:
+                incluirEstudanteOuProfessor(opcao, codigo)
+            elif opcao == 3:
+                incluirDisciplina(opcao, codigo)
+            elif opcao == 4:
+                incluirTurma(opcao, codigo)
+            else:
+                incluirMatricula(opcao, codigo)
+    except ValueError:
+        print("\nDeve ser um número!\n")
 
     input("Pressione ENTER para continuar.")
     print("\n")
@@ -209,38 +219,44 @@ def editar(opcao):
     if verificaVazia(lista, opcao):
         print("Não há nada cadastrado.\n")
     else:
-        codigo = int(input("Digite o código a ser alterado: "))
+        try:
+            codigo = int(input("Digite o código a ser alterado: "))
 
-        if verificaCadastro(opcao, codigo):
-            for i in range(0, len(lista[opcao-1])):
-                obj = lista[opcao-1][i]
-                if obj["codigo"] == codigo:
-                    codigoObj = int(input("Informe o novo código: "))
-                    if opcao == 1 or opcao == 2:
-                        nome = input("Informe o novo nome: ")
-                        cpf = input("Informe o novo CPF: ")
-                        obj["cpf"] = cpf
-                        obj["nome"] = nome
-                    if opcao == 4:
-                        codProfessor = int(
-                            input("Informe o código do professor: "))
-                        codDisciplina = int(
-                            input("Informe o código da disciplina: "))
-                        obj["codigo_professor"] = codProfessor
-                        obj["codigo_disciplina"] = codDisciplina
-                    if opcao == 5:
-                        codTurma = int(
-                            input("Informe o código da Turma: "))
-                        codEstudante = int(
-                            input("Informe o código do Estudante: "))
-                        obj["codigo_turma"] = codTurma
-                        obj["codigo_estudante"] = codEstudante
+            if verificaCadastro(opcao, codigo):
+                for i in range(0, len(lista[opcao-1])):
+                    obj = lista[opcao-1][i]
+                    if obj["codigo"] == codigo:
+                        codigoObj = int(input("Informe o novo código: "))
+                        if verificaCadastro(opcao, codigoObj):
+                            print("\nCódigo já cadastrado!\n")
+                            return
+                        if opcao == 1 or opcao == 2:
+                            nome = input("Informe o novo nome: ")
+                            cpf = input("Informe o novo CPF: ")
+                            obj["cpf"] = cpf
+                            obj["nome"] = nome
+                        if opcao == 4:
+                            codProfessor = int(
+                                input("Informe o código do professor: "))
+                            codDisciplina = int(
+                                input("Informe o código da disciplina: "))
+                            obj["codigo_professor"] = codProfessor
+                            obj["codigo_disciplina"] = codDisciplina
+                        if opcao == 5:
+                            codTurma = int(
+                                input("Informe o código da Turma: "))
+                            codEstudante = int(
+                                input("Informe o código do Estudante: "))
+                            obj["codigo_turma"] = codTurma
+                            obj["codigo_estudante"] = codEstudante
 
-                    obj["codigo"] = codigoObj
-                    print("Informações alteradas!\n")
-                    break
-        else:
-            print("\nCódigo não encontrado!\n")
+                        obj["codigo"] = codigoObj
+                        print("Informações alteradas!\n")
+                        break
+            else:
+                print("\nCódigo não encontrado!\n")
+        except ValueError:
+            print("Deve ser um número!")
 
     if opcao == 1:
         escreverJSON(lista[opcao-1], dadosEstudantes)
@@ -263,19 +279,22 @@ def excluir(opcao):
         print("Não há nada cadastrado.\n")
         return
 
-    codigo = int(input("Digite o código do cadastro a ser excluído: "))
+    try:
+        codigo = int(input("Digite o código do cadastro a ser excluído: "))
 
-    if verificaCadastro(opcao, codigo):
-        for i in range(0, len(lista[opcao-1])):
-            obj = lista[opcao-1][i]
-            if obj["codigo"] == codigo:
-                lista[opcao-1].pop(i)
-                print("\nCadastro deletado!\n")
-                break
-    else:
-        print("\nCadastro não encontrado!\n")
-        input("Pressione ENTER para continuar... ")
-        return
+        if verificaCadastro(opcao, codigo):
+            for i in range(0, len(lista[opcao-1])):
+                obj = lista[opcao-1][i]
+                if obj["codigo"] == codigo:
+                    lista[opcao-1].pop(i)
+                    print("\nCadastro deletado!\n")
+                    break
+        else:
+            print("\nCadastro não encontrado!\n")
+            input("Pressione ENTER para continuar... ")
+            return
+    except ValueError:
+        print("\nDeve ser um número!")
 
     if opcao == 1:
         escreverJSON(lista[opcao-1], dadosEstudantes)
